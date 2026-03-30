@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krishna Jha | AI & ML Engineer</title>
+    <!-- Modern Tech Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050810;
+            --surface: rgba(15, 23, 42, 0.6);
+            --accent: #f97316; /* Vibrant Orange */
+            --secondary: #00f2ff; /* Cyber Cyan */
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; /* Custom cursor implementation */
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- Custom Interactive Cursor --- */
+        #cursor {
+            width: 10px; height: 10px; background: var(--accent);
+            border-radius: 50%; position: fixed; pointer-events: none; z-index: 10000;
+            transition: transform 0.1s;
+        }
+        #cursor-follower {
+            width: 40px; height: 40px; border: 1px solid var(--secondary);
+            border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999;
+            transition: transform 0.2s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+
+        /* --- Background Canvas --- */
+        #cube-canvas {
+            position: fixed;
+            top: 0; right: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            padding: 1.5rem 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
+        }
+        .logo { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; }
+        .logo span { color: var(--accent); }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a { text-decoration: none; color: var(--text-dim); font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
+        .nav-links a:hover { color: var(--accent); }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 10%;
+            gap: 4rem;
+        }
+        .hero-text { flex: 1.2; z-index: 10; }
+        .badge {
+            background: var(--accent);
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        h1 { font-family: 'Syne', sans-serif; font-size: clamp(3rem, 8vw, 5.5rem); line-height: 0.9; margin-bottom: 1.5rem; }
+        .typing-container { color: var(--secondary); font-size: 1.5rem; font-weight: 700; height: 1.6em; }
+
+        /* --- Next Level Image Frame --- */
+        .hero-img {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+        .image-wrapper {
+            width: 320px;
+            height: 420px;
+            position: relative;
+            z-index: 5;
+        }
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            filter: contrast(1.1) brightness(0.9);
+            transition: 0.5s;
+        }
+        .image-wrapper:hover img { filter: brightness(1.1); transform: scale(1.02); }
+        
+        /* The Animated Frame Elements */
+        .frame-glow {
+            position: absolute;
+            top: -20px; left: -20px; right: -20px; bottom: -20px;
+            border: 1px solid var(--accent);
+            border-radius: 25px;
+            z-index: -1;
+            opacity: 0.3;
+            animation: pulse 4s infinite;
+        }
+        .frame-offset {
+            position: absolute;
+            top: 20px; left: 20px; width: 100%; height: 100%;
+            border: 2px solid var(--secondary);
+            border-radius: 20px;
+            z-index: -2;
+            transition: 0.5s;
+        }
+        .image-wrapper:hover .frame-offset { transform: translate(-10px, -10px); border-color: var(--accent); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.05); }
+        }
+
+        /* --- Sections --- */
+        section { padding: 8rem 10%; }
+        .reveal { opacity: 0; transform: translateY(50px); transition: 1s all ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        .section-title { font-family: 'Syne', sans-serif; font-size: 3rem; margin-bottom: 3rem; }
+        .section-title span { color: var(--accent); }
+
+        /* --- Skills Grid --- */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+        }
+        .skill-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 2.5rem 1.5rem;
+            border-radius: 20px;
+            text-align: center;
+            transition: 0.4s;
+            backdrop-filter: blur(10px);
+        }
+        .skill-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(249, 115, 22, 0.1);
+        }
+        .skill-card h3 { font-size: 1.2rem; margin-top: 10px; }
+
+        /* --- Contact --- */
+        .contact-card {
+            background: linear-gradient(135deg, var(--surface), transparent);
+            padding: 4rem;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .contact-links { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-top: 2rem; }
+        .c-link {
+            text-decoration: none; color: var(--text);
+            padding: 1rem 2rem; border: 1px solid var(--border);
+            border-radius: 50px; transition: 0.3s;
+            font-weight: 700;
+        }
+        .c-link:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
+        /* --- Responsive --- */
+        @media (max-width: 968px) {
+            .hero { flex-direction: column; text-align: center; height: auto; padding-top: 8rem; }
+            .hero-img { order: -1; }
+            .nav-links { display: none; }
+            h1 { font-size: 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Interactions -->
+    <div id="cursor"></div>
+    <div id="cursor-follower"></div>
+    <canvas id="cube-canvas"></canvas>
+
+    <nav>
+        <div class="logo">KJ<span>.</span></div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Stack</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="hero-text">
+            <div class="badge">AVAILABLE FOR COLLABORATION</div>
+            <h1>KRISHNA<br>JHA</h1>
+            <div class="typing-container">I'm a <span id="typing-target"></span></div>
+            <p style="color: var(--text-dim); max-width: 500px; margin-top: 1.5rem;">
+                First-year Engineering student obsessed with AI/ML. I bridge the gap between technical precision and creative storytelling.
+            </p>
+        </div>
+        <div class="hero-img">
+            <div class="image-wrapper">
+                <div class="frame-glow"></div>
+                <div class="frame-offset"></div>
+                <!-- Add your photo link below -->
+                <img src= "C:\Users\Sanjay Sir\Desktop\portfolio\krishna-jha.jpeg" alt="Krishna Jha">
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="reveal">
+        <div class="section-title">01. <span>THE GOAL</span></div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem;">
+            <p style="font-size: 1.25rem; color: var(--text-dim);">
+                Based in India, I am exploring the infinite possibilities of <strong style="color: var(--secondary);">Artificial Intelligence</strong>. 
+                My engineering journey is fueled by a dual passion: building robust data models and writing narratives that make tech accessible.
+            </p>
+            <div>
+                <p style="margin-bottom: 1rem;">- AI/ML Enthusiast</p>
+                <p style="margin-bottom: 1rem;">- Technical Storyteller</p>
+                <p>- Content Strategist</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="reveal">
+        <div class="section-title">02. <span>TECH STACK</span></div>
+        <div class="skills-grid">
+            <div class="skill-card"><h3>Python</h3></div>
+            <div class="skill-card"><h3>C Language</h3></div>
+            <div class="skill-card"><h3>JavaScript</h3></div>
+            <div class="skill-card"><h3>HTML/CSS</h3></div>
+        </div>
+    </section>
+
+    <section id="contact" class="reveal">
+        <div class="contact-card">
+            <div class="section-title" style="margin-bottom: 1rem;">Let's <span>Sync</span></div>
+            <p>Reach out for projects, blogs, or just to say hi.</p>
+            <div class="contact-links">
+                <a href="mailto:ikrishnajha21@gmail.com" class="c-link">Email Me</a>
+                <a href="tel:8898858595" class="c-link">Call</a>
+                <a href="https://www.linkedin.com/in/krishna-jha-59b969303" target="_blank" class="c-link">LinkedIn</a>
+            </div>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 4rem; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 0.8rem;">
+        &copy; 2026 KRISHNA JHA | BUILT FROM SCRATCH WITH CODE
+    </footer>
+
+    <script>
+        // 1. Custom Cursor Logic
+        const cursor = document.getElementById('cursor');
+        const follower = document.getElementById('cursor-follower');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+            follower.style.transform = `translate3d(${e.clientX - 15}px, ${e.clientY - 15}px, 0)`;
+        });
+
+        // 2. Typing Effect
+        const phrases = ["AI/ML Enthusiast.", "Storyteller.", "Engineering Student.", "Blog Writer."];
+        let i = 0, j = 0, current = "", isDeleting = false;
+        function type() {
+            current = phrases[i];
+            if (isDeleting) {
+                document.getElementById("typing-target").textContent = current.substring(0, j - 1);
+                j--;
+                if (j == 0) { isDeleting = false; i = (i + 1) % phrases.length; }
+            } else {
+                document.getElementById("typing-target").textContent = current.substring(0, j + 1);
+                j++;
+                if (j == current.length) isDeleting = true;
+            }
+            setTimeout(type, isDeleting ? 100 : 200);
+        }
+        type();
+
+        // 3. Scroll Reveal
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            reveals.forEach(el => {
+                var windowHeight = window.innerHeight;
+                var elementTop = el.getBoundingClientRect().top;
+                if (elementTop < windowHeight - 100) el.classList.add("active");
+            });
+        }
+        window.addEventListener("scroll", reveal);
+        reveal();
+
+        // 4. 3D Rubik's Cube Canvas
+        const canvas = document.getElementById('cube-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, pixels;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Drawing a simplified 3D projection of a grid (Cube vibe)
+        let angle = 0;
+        function draw() {
+            ctx.clearRect(0,0,width,height);
+            ctx.strokeStyle = '#f97316';
+            ctx.lineWidth = 0.5;
+            
+            const size = 300;
+            const cx = width * 0.8;
+            const cy = height * 0.5;
+
+            ctx.beginPath();
+            for(let i = -2; i <= 2; i++) {
+                for(let k = -2; k <= 2; k++) {
+                    let x = i * 60;
+                    let y = k * 60;
+                    
+                    // Rotate
+                    let rx = x * Math.cos(angle) - y * Math.sin(angle);
+                    let ry = x * Math.sin(angle) + y * Math.cos(angle);
+                    
+                    ctx.rect(cx + rx, cy + ry, 50, 50);
+                }
+            }
+            ctx.stroke();
+            angle += 0.005;
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
+</html>
